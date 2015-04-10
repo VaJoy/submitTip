@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+  <meta charset="UTF-8">
+  <title>Demo</title>
+  <style>
+    #tip-wrap{position:fixed;padding:20px;z-index:99999;background: white;border-radius:10px;}
+    .mask{position:fixed;left:0;right:0;top:0;bottom:0;z-index:9999;background:rgba(0,0,0,.3);}
+  </style>
+  <script src="jq.js"></script>
+  <script src="submitTip.js"></script>
+</head>
+<body>
+  <form id="form0">
+    <h5>基本资料</h5>
+    <div class="info-left">
+      <label for="info-username"><em>*</em>姓名：</label><input name="sdPartners.name" id="info-username" type="text"/><br/>
+      <label for="info-tel"><em>*</em>电话：</label><input name="sdPartners.phone" id="info-tel" type="text"/><br/>
+      <label for="info-province">地区：</label><input name="sdPartners.province" id="info-province" type="text"/>省<input name="sdPartners.city" id="info-city" type="text"/>市<input name="sdPartners.region" id="info-area" type="text"/>区/县<br/>
+      <label for="info-company">单位：</label><input name="sdPartners.unit" id="info-company" type="text"/><br/>
+    </div>
+    <div class="info-right">
+      <label for="info-dep">职务与部门：</label><input name="sdPartners.position" id="info-dep" type="text"/><br/>
+      <label for="info-email">email：</label><input name="sdPartners.email" id="info-email" type="text"/><br/>
+    </div>
+    <h5>公司经营范围</h5>
+    <div class="radios">
+      <input type="radio" name="sdPartners.businessType" value="5800200" checked />分销商
+      <input type="radio" name="sdPartners.businessType" value="5800201" />系统集成商
+      <input type="radio" name="sdPartners.businessType" value="5800202" />软件开发商
+      <input type="radio" name="sdPartners.businessType" value="5800203" />IT服务商
+      <input type="radio" name="sdPartners.businessType" value="5800204" />综合
+    </div>
+    <div>
+      <span>经营范围及销售的主要产品</span>
+      <textarea name="sdPartners.companyProducts" rows="8" cols="70"></textarea>
+    </div>
+    <h5 class="mg-t20">公司介绍</h5>
+    <textarea name="sdPartners.introduce" rows="8" cols="70"></textarea>
+    <a href="javascript:void(0)" id="submit">提交申请</a>
+  </form>
+
+  <div id="tip-wrap" style="display:none;">
+    正在提交您的信息，请稍后
+  </div>
+
+  <script>
+    function closeTip($mask,$tip,tipHtml,time){
+      setTimeout(function(){
+        $mask.add($tip).fadeOut(300,function(){
+          $tip.html(tipHtml);
+          $mask.remove();
+        })
+      },time)
+    }
+
+    $("#submit").submitTip({
+      url: 'server.json',
+      form: '#form0',
+      filter: function(datas){
+        var rq = {'sdPartners.name':1,'sdPartners.phone':1};
+        for(var i= 0;i<datas.length;i++){
+          if((datas[i].name in rq) && !datas[i].value){
+            alert('必要信息填写不完整，请填写后再提交');
+            return !1;
+          }
+        }
+        return !0;
+      },
+      buffer:function($mask,$tip,tipHtml){
+        $tip.text('您已提交过信息，请勿重复提交');
+        closeTip($mask,$tip,tipHtml,2000)
+      },
+      callback:function(data,$mask,$tip,tipHtml){
+        $tip.text(data.message);
+        closeTip($mask,$tip,tipHtml,2000)
+      },
+      error:function(e,$mask,$tip,tipHtml){
+        $tip.text('提交失败，请刷新重试');
+        closeTip($mask,$tip,tipHtml,2000)
+      }
+    });
+  </script>
+</body>
+</html>
