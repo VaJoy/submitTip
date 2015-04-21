@@ -43,7 +43,7 @@
         $(win).resize(pinTip);
 
         function initUI(){
-            $mask.hide().appendTo("body").fadeIn(option.showTime);
+            $mask.hide().insertAfter($tip).fadeIn(option.showTime);
             $tip.fadeIn(option.showTime);
             pinTip();
         }
